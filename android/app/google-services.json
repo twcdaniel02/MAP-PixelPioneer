@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1017503176651",
+    "project_id": "pixelpioneercpplink",
+    "storage_bucket": "pixelpioneercpplink.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1017503176651:android:782730a78e40d54f14084e",
+        "android_client_info": {
+          "package_name": "com.example.pixelpioneer_cpplink"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgwJ3XYKfu5D69iLoaZvCKiqEcWLN-CB4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
