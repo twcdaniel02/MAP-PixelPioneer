@@ -49,6 +49,8 @@ Future<dynamic> signupRider(var vehicleModel, var vehicleColor, var plateNumber,
       'email': registerEmail,
       'phone': registerPhone,
       'name': registerName,
+      'picture_url':'',
+      'created_at': FieldValue.serverTimestamp(),
     });
     // Create a rider entry in Firestore 'riders' collection
     DocumentReference riderRef =
@@ -58,6 +60,8 @@ Future<dynamic> signupRider(var vehicleModel, var vehicleColor, var plateNumber,
       'vehicle_color': vehicleColor.toString().toUpperCase(),
       'plate_number': plateNumber.toString().toUpperCase(),
       'vehicle_type': vehicleType.toString().toUpperCase(),
+      'picture_url': '',
+      'created_at': FieldValue.serverTimestamp(),
     });
 
     // Retrieve the newly created rider's document ID

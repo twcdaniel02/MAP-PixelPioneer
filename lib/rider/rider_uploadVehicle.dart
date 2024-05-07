@@ -76,30 +76,33 @@ class _RiderUploadVehicleState extends State<RiderUploadVehicle> {
 
   Future<void> uploadVehicle(dynamic id) async {
     print('Entering uploadVehicle');
+
     try {
+      print('entering try');
       final user = _auth.currentUser;
       if (user == null) throw Exception('No user logged in');
 
-      print(user);
-
-      String filePath =
-          'vehicles/${user.uid}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+      String filePath ='vehicles/${user.uid}/${DateTime.now().millisecondsSinceEpoch}.jpg';
       File file = File(_imageFile!.path);
+      print('File: $file');
 
       // Upload image
       UploadTask task = FirebaseStorage.instance.ref(filePath).putFile(file);
+      TaskSnapshot snapshot = await task;
+      String imageUrl = await snapshot.ref.getDownloadURL();
+      print('Image URL: $imageUrl');
 
-      print(_modelController.text.toUpperCase());
+     
       // Store vehicle details
       await _firestore.collection('riders').doc(user.uid).set({
         'vehicle_model': _modelController.text.toUpperCase(),
         'vehicle_color': _colorController.text.toUpperCase(),
         'plate_number': _plateController.text.toUpperCase(),
         'vehicle_type': _selectedVehicleType.toUpperCase(),
+        //'picture_url': imageUrl,
       }, SetOptions(merge: true));
 
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Vehicle uploaded successfully')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vehicle uploaded successfully')));
       Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context)
@@ -110,8 +113,7 @@ class _RiderUploadVehicleState extends State<RiderUploadVehicle> {
   }
 
   void getImage() async {
-    final XFile? pickedImage =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    final XFile? pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedImage != null) {
       setState(() {
         imageFile = File(pickedImage.path);
@@ -123,38 +125,42 @@ class _RiderUploadVehicleState extends State<RiderUploadVehicle> {
     });
   }
 
-  Future<void> uploadImage(String userId) async {
-    try {
-      if (fileImage == null) {
-        throw 'No image selected';
-      }
-
-      // Extracting file extension
-      final imageExtension = fileImage!.path.split('.').last.toLowerCase();
-
-      // Creating a file instance from the XFile
-      File imageFile = File(fileImage!.path);
-
-      // Defining the path in Firebase Storage
-      String filePath = 'riders/$userId/vehicle.$imageExtension';
-
-      // Uploading the file to Firebase Storage
-      TaskSnapshot snapshot =
-          await FirebaseStorage.instance.ref(filePath).putFile(imageFile);
-
-      // Retrieving the download URL
-      String imageUrl = await snapshot.ref.getDownloadURL();
-
-      // Updating Firestore with the new image URL
-      await FirebaseFirestore.instance
-          .collection('riders')
-          .doc(userId)
-          .update({'picture_url': imageUrl});
-    } catch (e) {
-      print('Error uploading image: $e');
-      // Handle exceptions or errors
+  Future<void> uploadImage(dynamic userId) async {
+  print('Entering uploadImage');
+  try {
+    print('ImageFile: $imageFile');
+    if (fileImage == null) {
+      throw 'No image selected';
     }
+      var querySnapshot = await _firestore.collection('riders')
+        .where('userId', isEqualTo: userId)
+        .get();
+
+      if (querySnapshot.docs.isEmpty) {
+      print("No matching rider found for the given userId.");
+      return;
+    }
+    print(querySnapshot);
+
+    // Assuming userId is unique and only one document should match
+    String riderId = querySnapshot.docs.first.id;
+    print(riderId);
+
+    // Defining the path in Firebase Storage
+    String filePath = 'riders/$userId/vehicle.${imageFile!.path.split('.').last.toLowerCase()}';
+
+    // Uploading the file to Firebase Storage
+    TaskSnapshot snapshot = await FirebaseStorage.instance.ref(filePath).putFile(imageFile!);
+    String imageUrl = await snapshot.ref.getDownloadURL();
+    print('Image uploaded: $imageUrl');
+
+    // Updating Firestore with the new image URL
+    await _firestore.collection('riders').doc(riderId).update({'picture_url': imageUrl});
+    print('Firestore updated with image URL');
+  } catch (e) {
+    print('Error uploading image: $e');
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -511,12 +517,19 @@ class _RiderUploadVehicleState extends State<RiderUploadVehicle> {
                                     setState(() {
                                       isLoading = true;
                                     });
-                                    var vehicleModel = _modelController.text.toUpperCase();
-                                    var vehicleColor = _colorController.text.toUpperCase();
-                                    var plateNumber = _plateController.text.toUpperCase();
+                                    var vehicleModel =
+                                        _modelController.text.toUpperCase();
+                                    var vehicleColor =
+                                        _colorController.text.toUpperCase();
+                                    var plateNumber =
+                                        _plateController.text.toUpperCase();
                                     var vehicleType = _selectedVehicleType;
                                     if (_formKey.currentState!.validate()) {
-                                      final id = await signupRider(vehicleModel,vehicleColor,plateNumber,vehicleType);
+                                      final id = await signupRider(
+                                          vehicleModel,
+                                          vehicleColor,
+                                          plateNumber,
+                                          vehicleType);
                                       // await signIn();
                                       await uploadVehicle(id);
                                       await uploadImage(id);
@@ -630,7 +643,11 @@ class _RiderUploadVehicleState extends State<RiderUploadVehicle> {
                                                       TextButton(
                                                           onPressed: () async {
                                                             try {
-                                                              await signupRider(vehicleModel,vehicleColor,plateNumber,vehicleType);
+                                                              await signupRider(
+                                                                  vehicleModel,
+                                                                  vehicleColor,
+                                                                  plateNumber,
+                                                                  vehicleType);
                                                               Navigator
                                                                   .pushNamedAndRemoveUntil(
                                                                       context,
