@@ -191,13 +191,19 @@ Future<void> getRiderDetail(String userId) async {
         .doc(id)
         .get();
 
-    if (userDoc.exists) {
-      user_name = userDoc.data()!['name'];
-      user_phone = userDoc.data()!['phone'];
-      user_email = userDoc.data()!['email'];
-      user_picture = userDoc.data()!['picture_url'];
+        print('id in getData method is: $id');
+        print(userDoc);
+        print(userDoc.data());
 
-      // Get user picture
+    if (userDoc.exists) {
+    print("Fetched user data: ${userDoc.data()}");
+    if (userDoc.data() != null) {
+      Map<String, dynamic> data = userDoc.data()!;
+      user_name = data['name'];
+      user_phone = data['phone'];
+      user_email = data['email'];
+      user_picture = data['picture_url'];
+
       if (user_picture != null) {
         picture = Image.network(
           user_picture!,
@@ -206,7 +212,12 @@ Future<void> getRiderDetail(String userId) async {
           height: 70,
         );
       }
+    } else {
+      print("Document is empty!");
     }
+  } else {
+    print("No such document!");
+  }
 
     // Get customer parcel delivery request with 'accepted' or 'request' status
     final bookingQuerySnapshot = await FirebaseFirestore.instance

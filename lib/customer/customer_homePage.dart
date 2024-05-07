@@ -12,11 +12,24 @@ class CustomerHomepage extends StatefulWidget {
 class _CustomerHomepageState extends State<CustomerHomepage> {
   bool shouldShowRow = false; // Placeholder for a condition
   String? userId = FirebaseAuth.instance.currentUser?.uid;
+  String userName = "Guest";
 
-  @override
-  void initState() {
-    super.initState();
+    Future<void> fetchUserData() async { //! Change1: add this method
     if (userId != null) {
+      // Fetch user data from Firestore
+      DocumentSnapshot userData = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      // Check if document exists and contains name field
+      if (userData.exists && userData.data() != null) {
+        setState(() {
+          userName = userData.get('name') ?? "Guest";
+        });
+      }
+
+      // Listen to booking collection changes
       FirebaseFirestore.instance
           .collection('booking')
           .where('userId', isEqualTo: userId)
@@ -25,11 +38,17 @@ class _CustomerHomepageState extends State<CustomerHomepage> {
         if (snapshot.docs.isNotEmpty) {
           setState(() {
             shouldShowRow = true;
-            // More data handling logic can be added here
           });
         }
       });
     }
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserData(); //! change2 here
   }
 
   @override
@@ -80,8 +99,7 @@ class _CustomerHomepageState extends State<CustomerHomepage> {
                     ),
                     child: ClipOval(
                       child: Image.network(
-                        FirebaseAuth.instance.currentUser?.photoURL ??
-                            'https://via.placeholder.com/150',
+                        FirebaseAuth.instance.currentUser?.photoURL ??'https://via.placeholder.com/150',
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
                           color: Colors.grey,
@@ -91,7 +109,8 @@ class _CustomerHomepageState extends State<CustomerHomepage> {
                   ),
                   const SizedBox(width: 10.0),
                   Text(
-                    'Welcome back, ${FirebaseAuth.instance.currentUser?.displayName ?? "Guest"}',
+                    // 'Welcome back, ${FirebaseAuth.instance.currentUser?.displayName ?? "Guest"}',
+                    'Welcome back, $userName', //!! change3 here to print the name
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 17,
@@ -245,16 +264,14 @@ class _CustomerHomepageState extends State<CustomerHomepage> {
             const SizedBox(
               height: 30,
             ),
-            /////////////////////////second row for update and feedback buttons
+
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Row(
-                  mainAxisAlignment: MainAxisAlignment
-                      .spaceBetween, //book and check parcel button
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween, //book and check parcel button
                   children: [
                     InkWell(
                       onTap: () {
-                        Navigator.of(context)
-                            .pushReplacementNamed('/customer_profile');
+                        Navigator.of(context).pushReplacementNamed('/customer_profile');
                         // Your code to handle the tap event
                       },
                       child: Container(
@@ -307,8 +324,7 @@ class _CustomerHomepageState extends State<CustomerHomepage> {
                     ),
                     InkWell(
                       onTap: () {
-                        Navigator.of(context)
-                            .pushReplacementNamed('/customer_quickScan');
+                        Navigator.of(context).pushReplacementNamed('/customer_quickScan');
                         // Your code to handle the tap event
                       },
                       child: Container(

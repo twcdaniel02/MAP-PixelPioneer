@@ -58,7 +58,7 @@ class _CustomerRegisterPageState extends State<CustomerRegisterPage> {
           'user_id': userCredential.user!.uid,
           'name': _nameController.text.trim(),
           'phone': _phoneController.text.trim(),
-          'email': registerEmail,
+          'email': _emailController.text.trim(), //!Modify this if cannot store the email.
           'riderId': '',
         });
         Navigator.of(context).pushReplacementNamed('/login');

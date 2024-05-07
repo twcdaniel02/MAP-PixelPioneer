@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:pixelpioneer_cpplink/customer/customer_homePage.dart';
+import 'package:pixelpioneer_cpplink/customer/customer_updateProfile.dart';
 import 'package:pixelpioneer_cpplink/customer_register.dart';
 import 'package:pixelpioneer_cpplink/registerType_Page.dart';
 import 'package:pixelpioneer_cpplink/rider/rider_homePage.dart';
@@ -60,7 +61,7 @@ class MyApp extends StatelessWidget {
 
         //customer
         '/customer_home': (context) => const CustomerHomepage(),
-        // '/customer_profile': (context) => const CustomerProfile(),
+        '/customer_profile': (context) => const CustomerProfile(),
         // '/changeName': (context) => const CustomerChangeName(),
         // '/changePw': (context) => const CustomerChangePassword(),
         // '/changePFP': (context) => const CustomerChangePicture(),

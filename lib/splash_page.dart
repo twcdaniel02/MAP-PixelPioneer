@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:pixelpioneer_cpplink/controller.dart';
 
 import 'main.dart'; // Make sure this is set up correctly for navigation
 
@@ -40,14 +41,14 @@ class _SplashPageState extends State<SplashPage> {
       Navigator.of(context).pushReplacementNamed('/admin_home');
     } else if (riderDoc.exists) {
       print('User is a rider');
-      //  await getData(userID);
+      await getData(userID);
       //   await getRiderStatus(); //for checking rider status
       //   await checkDelivery();
       //   await updateListParcel();
       Navigator.of(context).pushReplacementNamed('/rider_home');
     } else if (customerDoc.exists) {
       print('User is a customer');
-      // await getData(userID);
+      await getData(userID);
       //   await updateListParcel();
       Navigator.of(context).pushReplacementNamed('/customer_home');
     }
