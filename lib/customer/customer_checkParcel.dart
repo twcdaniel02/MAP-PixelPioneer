@@ -23,6 +23,7 @@ class _customerCheckParcelState extends State<customerCheckParcel> {
   bool myParcel = false;
   int parcel_counter = 0;
   int delivery_counter = 0;
+  var firestone = FirebaseFirestore.instance;
 
   @override
   void initState() {
@@ -62,9 +63,11 @@ class _customerCheckParcelState extends State<customerCheckParcel> {
   }
 
   void filterParcel() {
+    CollectionReference parcelsRef = FirebaseFirestore.instance.collection('parcels');
     parcel_list = List.from(parcel_list);
     parcel_counter = 0;
     delivery_counter = 0;
+    Query query = parcelsRef;
     setState(() {
       //category is my parcel
       if (parcelCategory == "My Parcel") {
