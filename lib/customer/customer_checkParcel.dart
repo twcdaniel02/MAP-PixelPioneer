@@ -68,65 +68,69 @@ class _customerCheckParcelState extends State<customerCheckParcel> {
     parcel_counter = 0;
     delivery_counter = 0;
     Query query = parcelsRef;
-    setState(() {
+    setState() {
       //category is my parcel
       if (parcelCategory == "My Parcel") {
         // my parcel, has input
         if (searchInput.isNotEmpty) {
           //my parcel, has input, status all
           if (parcelStatus == 'All') {
-            parcel_list = parcel_data
-                .where((element) =>
-                    (element['user_id'] != null) &&
-                    (element['user_id']
-                        .contains(supabase.auth.currentUser!.id)) &&
-                    (element['tracking_id']!
-                        .toLowerCase()
-                        .contains(searchInput.toLowerCase())))
-                .toList();
-            return;
+                String currentUserID = FirebaseAuth.instance.currentUser!.uid;
+            parcel_list = parcel_data; 
+            parcel_data.forEach((element){
+               if (element['user_id'] != null &&
+            element['user_id'].contains(currentUserID) &&
+            element['tracking_id']
+                .toLowerCase()
+                .contains(searchInput.toLowerCase())) {
+            parcel_list.add(element);
+            }
+          });
+          }   
           } else
           //my parcel, has input, status is not all
           {
-            parcel_list = parcel_data
-                .where((element) =>
-                    (element['user_id'] != null) &&
-                    (element['user_id']
-                        .contains(supabase.auth.currentUser!.id)) &&
-                    (element['tracking_id']!
-                        .toLowerCase()
-                        .contains(searchInput.toLowerCase())) &&
-                    (element['status'].contains(parcelStatus.toLowerCase())))
-                .toList();
-            return;
+           String currentUserID = FirebaseAuth.instance.currentUser!.uid;
+            parcel_list = parcel_data;
+            parcel_data.forEach((element){
+              if(element['user_id']!=null &&
+              element['user_id'].contains(currentUserID)&&
+              element['tracking_id']!.toLowerCase().contains(searchInput.toLowerCase())
+              && element['status'].contains(parcelStatus.toLowerCase())){
+                parcel_list.add(element);
+              }
+            });
           }
           //my parcel, has no input
-        } else {
+         else {
           //my parcel, has no input, status is all
           if (parcelStatus == 'All') {
-            parcel_list = parcel_data
-                .where((element) =>
-                    (element['user_id'] != null) &&
-                    (element['user_id']
-                        .contains(supabase.auth.currentUser!.id)))
-                .toList();
-            return;
+            String currentUserID = FirebaseAuth.instance.currentUser!.uid;
+            parcel_list = parcel_data;
+            parcel_data.forEach((element){
+              if(element['user_id']!= null &&
+              element['user_id'].contains(currentUserID)){
+                parcel_list.add(element);
+              }
+            });
           } else {
             //my parcel, has no input, status is not all
-            parcel_list = parcel_data
-                .where((element) =>
-                    (element['user_id'] != null) &&
-                    (element['user_id']
-                        .contains(supabase.auth.currentUser!.id)) &&
-                    (element['status'].contains(parcelStatus.toLowerCase())))
-                .toList();
-            return;
+            String currentUserID = FirebaseAuth.instance.currentUser!.uid;
+            parcel_list = parcel_data;
+            parcel_data.forEach((element){
+              if(element['user_id']!=null &&
+              element['user_id'].contains(currentUserID)&&
+              element['status'].contains(parcelStatus.toLowerCase())){
+                parcel_list.add(element);
+              }
+            });
           }
-        }
+        } }
+    
         ////////////////////////////////////////
         ////////////////////////////////////////
         //category is not my parcel
-      } else {
+       else {
         // not my parcel, has input
         if (searchInput.isNotEmpty) {
           //not my parcel, has input, status all
@@ -169,8 +173,8 @@ class _customerCheckParcelState extends State<customerCheckParcel> {
           }
         }
       }
-    });
-  }
+    }
+    
 
   @override
   Widget build(BuildContext context) {
